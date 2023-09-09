@@ -70,7 +70,7 @@ class Main:
 
         for i in range(num_players):
             name = input(f"What is player {i+1}'s name? ")
-            board = [[" " for _ in range(15)] for _ in range(15)]
+            board = [[" " for i in range(15)] for i in range(15)]
             tiles = []
             
             # Create a Player object and append it to the 'players' list
@@ -86,5 +86,63 @@ class Main:
 
         random_bag = Bag("Bag", bag)
         random_bag.mixtiles()
+        
+        print("Tiles in bag:", random_bag.gettiles())
+        print("Number of tiles in bag:", random_bag.getnumtiles())
+        print("Game Setup Complete!")
+
+        for player in players:
+            player.addrandomtiles(random_bag.gettiles(), 7)
+
+        # Game Loop
+
+        while True:
+            for player in players:
+                
+                if os.name == "nt":
+                    os.system("cls")
+                else:
+                    os.system("clear")
+
+                print(f"{player.getname()}'s turn!")
+                print("Tiles:", player.gettiles())
+                print("Board:")
+                for row in player.getboard():
+                    print(row)
+
+                while True:
+                    try:
+
+                        print("Enter a tile to play ((tile),(row),(col)), 'pass' to pass, or swap to swap 1 tile for 3 new tiles tiles.")
+                        user_command = input("Command: ")
+
+                        if user_command == "pass":
+                            break
+                        elif user_command == "swap":
+                            if player.getnumtiles() > 0:
+
+                                print("Enter the tile you want to swap.")
+                                tile = input("Tile: ")
+                                if tile in player.gettiles():
+
+                                    player.gettiles().remove(tile)
+                                    random_bag.gettiles().append(tile)
+                                    player.addrandomtiles(random_bag.gettiles(), 3)
+                                    print("Tiles:", player.gettiles())
+                                    break
+                                else:
+                                    print("You don't have that tile.")
+                            else:
+                                print("You don't have any tiles to swap.")
+                        elif user_command == "quit":
+                            return
+                        else:
+                            tile, row, col = user_command.split(",")
+                            if player.playtile(tile, int(row), int(col)):
+                                break
+                            else:
+                                print("Invalid move.")
+                    except ValueError:
+                        print("Invalid move. get good")
 
 Main.startgame()
